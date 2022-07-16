@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key, required this.title}) : super(key: key);
+  static const id = '/';
 
-  final String title;
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -14,14 +15,35 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Tripper'),
       ),
       body: const Center(
         child: Text('Hello World'),
       ),
-      floatingActionButton: const FloatingActionButton(
-        onPressed: null,
-        child: Icon(Icons.add),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openNewTripPage,
+        tooltip: 'New Trip',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _openNewTripPage() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return const NewTripPage();
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return const FadeUpwardsPageTransitionsBuilder().buildTransitions(
+            MaterialPageRoute(builder: (context) => const NewTripPage()),
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          );
+        },
       ),
     );
   }
