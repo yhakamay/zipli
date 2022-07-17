@@ -38,6 +38,7 @@ class _EditTripPageState extends State<EditTripPage> {
             onPressed: () {
               showDialog(
                 context: context,
+                barrierDismissible: false,
                 builder: (_) => AlertDialog(
                   title: const Text('Discard changes?'),
                   content: const Text('Changes you made will not be saved.'),
