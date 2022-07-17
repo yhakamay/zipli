@@ -28,11 +28,13 @@ class _HomePageState extends State<HomePage> {
         const MyTripsListView(),
         const ProfileScreen(),
       ][_currentPageIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openNewTripPage,
-        tooltip: 'New Trip',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _currentPageIndex == 0
+          ? FloatingActionButton(
+              onPressed: _openNewTripPage,
+              tooltip: 'New Trip',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
