@@ -198,7 +198,6 @@ class _NewTripPageState extends State<NewTripPage> {
           vertical: 8.0,
         ),
         child: TextField(
-          //controller: controller,
           maxLength: 16,
           onChanged: ((newTitle) {
             setState(() {
@@ -215,7 +214,7 @@ class _NewTripPageState extends State<NewTripPage> {
       title: const Text('Overview'),
       isActive: _currentIndex == 2,
       state: StepState.complete,
-      content: TripOverview(tripDetails: _tripDetails),
+      content: TripOverview(_tripDetails),
     );
   }
 

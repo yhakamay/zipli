@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
 
 import 'place_details.dart';
@@ -42,7 +43,7 @@ class PlaceAPI {
 
   Future<PlaceDetails> getPlaceDetails(String placeId) async {
     final request = Uri.parse(
-        '$_placeApiBaseUrl/details/json?fields=name%2Crating%2Cformatted_address%2Caddress_components&place_id=$placeId&key=$_apiKey&sessiontoken=$sessionToken');
+        '$_placeApiBaseUrl/details/json?fields=name%2Crating%2Cgeometry%2Cformatted_address%2Caddress_components&place_id=$placeId&key=$_apiKey&sessiontoken=$sessionToken');
     final response = await _client.get(request);
 
     if (response.statusCode == 200) {
@@ -65,6 +66,10 @@ class PlaceAPI {
           city: city,
           rating: result['result']['rating'].toDouble(),
           formattedAddress: result['result']['formatted_address'],
+          location: LatLng(
+            result['result']['geometry']['location']['lat'],
+            result['result']['geometry']['location']['lng'],
+          ),
         );
       }
 

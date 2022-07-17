@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:tripper/molecules/trip_overview.dart';
-import 'package:tripper/pages/edit_trip.dart';
+import 'package:tripper/pages/edit_trip_page.dart';
 
 import '../others/trip_details.dart';
 
