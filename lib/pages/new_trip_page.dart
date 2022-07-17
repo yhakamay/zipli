@@ -8,7 +8,7 @@ import 'package:tripper/others/place_api.dart';
 import 'package:tripper/others/trip_details.dart';
 import 'package:uuid/uuid.dart';
 
-import '../atoms/outlined_card.dart';
+import '../molecules/trip_overview.dart';
 import '../others/place_details.dart';
 import '../others/place_search_delegate.dart';
 
@@ -215,42 +215,7 @@ class _NewTripPageState extends State<NewTripPage> {
       title: const Text('Overview'),
       isActive: _currentIndex == 2,
       state: StepState.complete,
-      content: OutlinedCard(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                _tripDetails.title ?? 'No title',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Text(
-              '${DateFormat.yMMMd().format(_tripDetails.startDate)} - ${DateFormat.yMMMMd().format(_tripDetails.endDate)}',
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _tripDetails.places.length,
-                itemBuilder: (context, index) {
-                  final place = _tripDetails.places[index];
-
-                  return ListTile(
-                    title: Text(place.name ?? 'Unknown'),
-                    subtitle: Text(place.city ?? 'Unknown'),
-                    visualDensity: const VisualDensity(
-                      horizontal: 0,
-                      vertical: -4,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      content: TripOverview(tripDetails: _tripDetails),
     );
   }
 
