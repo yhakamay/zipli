@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:tripper/molecules/trip_overview.dart';
+import 'package:tripper/pages/edit_trip_page.dart';
 
+import '../atoms/filled_button.dart';
 import '../others/trip_details.dart';
 
 class MyTripsListView extends StatelessWidget {
@@ -23,8 +25,76 @@ class MyTripsListView extends StatelessWidget {
         final tripDetails =
             TripDetails.fromFirestore(snapshot.data() as Map<String, dynamic>);
 
-        return TripOverview.small(tripDetails);
+        return Dismissible(
+          key: ValueKey(tripDetails.id),
+          background: Container(
+            color: Theme.of(context).colorScheme.error,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.onError,
+                ),
+                const SizedBox(width: 8.0),
+              ],
+            ),
+          ),
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) {
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection('trips')
+                .doc(tripDetails.id)
+                .delete();
+          },
+          confirmDismiss: (_) async {
+            return await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => AlertDialog(
+                title: const Text('Delete this trip?'),
+                content: const Text('This action cannot be undone.'),
+                actions: [
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () => Navigator.pop(context, false),
+                  ),
+                  FilledButton(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.pop(context, true),
+                  ),
+                ],
+              ),
+            );
+          },
+          child: GestureDetector(
+            onTap: () => _openTripDetailsPage(context, tripDetails),
+            child: TripOverview.small(tripDetails),
+          ),
+        );
       },
+    );
+  }
+
+  void _openTripDetailsPage(BuildContext context, TripDetails tripDetails) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return EditTripPage(tripDetails);
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return const FadeUpwardsPageTransitionsBuilder().buildTransitions(
+            MaterialPageRoute(builder: (context) => EditTripPage(tripDetails)),
+            context,
+            animation,
+            secondaryAnimation,
+            child,
+          );
+        },
+      ),
     );
   }
 }
