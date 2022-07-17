@@ -10,4 +10,22 @@ class PlaceDetails {
   final String? formattedAddress;
   final double? rating;
   final String? city;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'formattedAddress': formattedAddress,
+      'rating': rating,
+      'city': city,
+    };
+  }
+
+  factory PlaceDetails.fromFirestore(Map<String, dynamic> firestore) {
+    return PlaceDetails(
+      name: firestore['name'],
+      formattedAddress: firestore['formattedAddress'],
+      rating: firestore['rating'],
+      city: firestore['city'],
+    );
+  }
 }

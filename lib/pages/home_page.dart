@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutterfire_ui/auth.dart';
+import 'package:tripper/atoms/profile_navigation_destination.dart';
+import 'package:tripper/atoms/trips_navigation_destination.dart';
+import 'package:tripper/organisms/my_trips_list_view.dart';
 import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,20 +15,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentPageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tripper'),
       ),
-      body: const Center(
-        child: Text('Hello World'),
-      ),
+      bottomNavigationBar: _buildNavigationBar(),
+      body: [
+        const MyTripsListView(),
+        const ProfileScreen(),
+      ][_currentPageIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: _openNewTripPage,
         tooltip: 'New Trip',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  NavigationBar _buildNavigationBar() {
+    return NavigationBar(
+      onDestinationSelected: (int index) {
+        setState(() {
+          _currentPageIndex = index;
+        });
+      },
+      selectedIndex: _currentPageIndex,
+      destinations: const [
+        TripsNavigationDestination(),
+        ProfileNavigationDestination(),
+      ],
     );
   }
 
