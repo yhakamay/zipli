@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'pages/home_page.dart';
-import 'pages/new_trip_page.dart';
+import 'others/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,11 +25,7 @@ class Tripper extends StatelessWidget {
           border: OutlineInputBorder(),
         ),
       ),
-      home: const HomePage(),
-      initialRoute: HomePage.id,
-      routes: {
-        NewTripPage.id: (context) => const NewTripPage(),
-      },
+      home: const AuthGate(),
     );
   }
 }
