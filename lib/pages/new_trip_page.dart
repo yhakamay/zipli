@@ -199,7 +199,7 @@ class _NewTripPageState extends State<NewTripPage> {
         ),
         child: TextField(
           //controller: controller,
-          maxLength: 12,
+          maxLength: 16,
           onChanged: ((newTitle) {
             setState(() {
               _tripDetails.title = newTitle;
