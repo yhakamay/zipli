@@ -19,6 +19,7 @@ dependencies:
   localstore: ^1.2.3
   flutterfire_ui: ^0.4.2+3
   firebase_core: ^1.19.2
+  cloud_firestore: ^3.3.0
 
 dev_dependencies:
   flutter_test:

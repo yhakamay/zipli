@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterfire_ui/auth.dart';
 import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -45,11 +46,7 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.center,
           child: const Text('Page 1'),
         ),
-        Container(
-          color: Colors.green,
-          alignment: Alignment.center,
-          child: const Text('Page 2'),
-        ),
+        const ProfileScreen(),
       ][currentPageIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: _openNewTripPage,
