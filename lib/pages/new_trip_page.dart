@@ -301,5 +301,15 @@ class _NewTripPageState extends State<NewTripPage> {
     }
   }
 
-  void _saveTripDetails(TripDetails tripDetails) {}
+  Future<void> _saveTripDetails(TripDetails tripDetails) async {
+    final users = FirebaseFirestore.instance.collection('users');
+    final me = users.doc(FirebaseAuth.instance.currentUser!.uid);
+    final myTrips = me.collection('trips');
+
+    myTrips
+        .doc(tripDetails.id)
+        .set(tripDetails.toFirestore())
+        .then((value) => print('Trip saved!'))
+        .catchError((error) => print(error));
+  }
 }

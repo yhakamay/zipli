@@ -20,4 +20,17 @@ class TripDetails {
   DateTime createdAt;
   DateTime updatedAt;
   List<PlaceDetails> places;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'startDate': startDate.millisecondsSinceEpoch,
+      'endDate': endDate.millisecondsSinceEpoch,
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
+      'places': places.map((place) => place.toFirestore()).toList(),
+    };
+  }
 }

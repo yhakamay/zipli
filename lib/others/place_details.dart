@@ -10,4 +10,13 @@ class PlaceDetails {
   final String? formattedAddress;
   final double? rating;
   final String? city;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'formattedAddress': formattedAddress,
+      'rating': rating,
+      'city': city,
+    };
+  }
 }
