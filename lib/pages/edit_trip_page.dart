@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:tripper/atoms/filled_button.dart';
 import 'package:uuid/uuid.dart';
 
 import '../atoms/filled_tonal_button.dart';
@@ -34,7 +35,28 @@ class _EditTripPageState extends State<EditTripPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Discard changes?'),
+                  content: const Text('Changes you made will not be saved.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FilledButton(
+                      child: const Text('OK'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
             icon: const Icon(Icons.close),
           ),
           title: const Text('Edit Trip'),
