@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int currentPageIndex = 0;
+  int _currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +23,10 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
-            currentPageIndex = index;
+            _currentPageIndex = index;
           });
         },
-        selectedIndex: currentPageIndex,
+        selectedIndex: _currentPageIndex,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.airplane_ticket_outlined),
@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           child: const Text('Page 1'),
         ),
         const ProfileScreen(),
-      ][currentPageIndex],
+      ][_currentPageIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: _openNewTripPage,
         tooltip: 'New Trip',
