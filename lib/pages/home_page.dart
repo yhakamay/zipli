@@ -1,5 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
+import 'package:flutterfire_ui/firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:tripper/atoms/outlined_card.dart';
+import 'package:tripper/others/trip_details.dart';
 import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,6 +19,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
+  final _myTripsQuery = FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('trips')
+      .orderBy('createdAt', descending: true);
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +52,21 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: [
-        Container(
-          color: Colors.red,
-          alignment: Alignment.center,
-          child: const Text('Page 1'),
+        FirestoreListView(
+          query: _myTripsQuery,
+          itemBuilder: (context, snapshot) {
+            final TripDetails trip = TripDetails.fromFirestore(
+                snapshot.data() as Map<String, dynamic>);
+
+            return OutlinedCard(
+              child: ListTile(
+                title: Text(trip.title ?? 'Unknown'),
+                subtitle: Text(
+                  '${DateFormat.yMMMMd().format(trip.startDate)} - ${DateFormat.yMMMMd().format(trip.endDate)}',
+                ),
+              ),
+            );
+          },
         ),
         const ProfileScreen(),
       ][_currentPageIndex],
