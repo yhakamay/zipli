@@ -33,4 +33,19 @@ class TripDetails {
       'places': places.map((place) => place.toFirestore()).toList(),
     };
   }
+
+  factory TripDetails.fromFirestore(Map<String, dynamic> firestore) {
+    return TripDetails(
+      id: firestore['id'],
+      title: firestore['title'],
+      description: firestore['description'],
+      startDate: DateTime.fromMillisecondsSinceEpoch(firestore['startDate']),
+      endDate: DateTime.fromMillisecondsSinceEpoch(firestore['endDate']),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(firestore['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(firestore['updatedAt']),
+      places: firestore['places']
+          .map<PlaceDetails>((place) => PlaceDetails.fromFirestore(place))
+          .toList(),
+    );
+  }
 }
