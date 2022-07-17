@@ -1,11 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:flutterfire_ui/firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:tripper/atoms/outlined_card.dart';
-import 'package:tripper/others/trip_details.dart';
+import 'package:tripper/atoms/profile_navigation_destination.dart';
+import 'package:tripper/atoms/trips_navigation_destination.dart';
+import 'package:tripper/molecules/my_trips_list_view.dart';
 import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,11 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
-  final _myTripsQuery = FirebaseFirestore.instance
-      .collection('users')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection('trips')
-      .orderBy('createdAt', descending: true);
 
   @override
   Widget build(BuildContext context) {
@@ -31,43 +23,9 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Tripper'),
       ),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            _currentPageIndex = index;
-          });
-        },
-        selectedIndex: _currentPageIndex,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.airplane_ticket_outlined),
-            selectedIcon: Icon(Icons.airplane_ticket),
-            label: 'Trips',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.account_circle_outlined),
-            selectedIcon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      bottomNavigationBar: _buildNavigationBar(),
       body: [
-        FirestoreListView(
-          query: _myTripsQuery,
-          itemBuilder: (context, snapshot) {
-            final TripDetails trip = TripDetails.fromFirestore(
-                snapshot.data() as Map<String, dynamic>);
-
-            return OutlinedCard(
-              child: ListTile(
-                title: Text(trip.title ?? 'Unknown'),
-                subtitle: Text(
-                  '${DateFormat.yMMMMd().format(trip.startDate)} - ${DateFormat.yMMMMd().format(trip.endDate)}',
-                ),
-              ),
-            );
-          },
-        ),
+        const MyTripsListView(),
         const ProfileScreen(),
       ][_currentPageIndex],
       floatingActionButton: FloatingActionButton(
@@ -75,6 +33,21 @@ class _HomePageState extends State<HomePage> {
         tooltip: 'New Trip',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  NavigationBar _buildNavigationBar() {
+    return NavigationBar(
+      onDestinationSelected: (int index) {
+        setState(() {
+          _currentPageIndex = index;
+        });
+      },
+      selectedIndex: _currentPageIndex,
+      destinations: const [
+        TripsNavigationDestination(),
+        ProfileNavigationDestination(),
+      ],
     );
   }
 
