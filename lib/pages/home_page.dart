@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:tripper/atoms/profile_navigation_destination.dart';
 import 'package:tripper/atoms/trips_navigation_destination.dart';
-import 'package:tripper/molecules/my_trips_list_view.dart';
+import 'package:tripper/organisms/my_trips_list_view.dart';
 import 'package:tripper/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
