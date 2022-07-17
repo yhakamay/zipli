@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
-import 'package:intl/intl.dart';
+import 'package:tripper/molecules/trip_overview.dart';
 
-import '../atoms/outlined_card.dart';
 import '../others/trip_details.dart';
 
 class MyTripsListView extends StatelessWidget {
@@ -21,17 +20,10 @@ class MyTripsListView extends StatelessWidget {
     return FirestoreListView(
       query: myTripsQuery,
       itemBuilder: (context, snapshot) {
-        final TripDetails trip =
+        final tripDetails =
             TripDetails.fromFirestore(snapshot.data() as Map<String, dynamic>);
 
-        return OutlinedCard(
-          child: ListTile(
-            title: Text(trip.title ?? 'Unknown'),
-            subtitle: Text(
-              '${DateFormat.yMMMMd().format(trip.startDate)} - ${DateFormat.yMMMMd().format(trip.endDate)}',
-            ),
-          ),
-        );
+        return TripOverview.small(tripDetails);
       },
     );
   }
