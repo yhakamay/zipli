@@ -9,11 +9,11 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const Tripper());
+  runApp(const Zipli());
 }
 
-class Tripper extends StatelessWidget {
-  const Tripper({Key? key}) : super(key: key);
+class Zipli extends StatelessWidget {
+  const Zipli({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

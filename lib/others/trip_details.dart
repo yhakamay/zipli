@@ -1,4 +1,4 @@
-import 'package:tripper/others/place_details.dart';
+import 'package:zipli/others/place_details.dart';
 
 class TripDetails {
   TripDetails({
