@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tripper/atoms/filled_button.dart';
-import 'package:tripper/atoms/filled_tonal_button.dart';
-import 'package:tripper/atoms/no_locations.dart';
-import 'package:tripper/others/place_api.dart';
-import 'package:tripper/others/trip_details.dart';
+import 'package:zipli/atoms/filled_button.dart';
+import 'package:zipli/atoms/filled_tonal_button.dart';
+import 'package:zipli/atoms/no_locations.dart';
+import 'package:zipli/others/place_api.dart';
+import 'package:zipli/others/trip_details.dart';
 import 'package:uuid/uuid.dart';
 
 import '../atoms/deletable_background.dart';

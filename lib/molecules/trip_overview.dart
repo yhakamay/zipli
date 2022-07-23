@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tripper/atoms/place_list_tile.dart';
-import 'package:tripper/atoms/trip_duration.dart';
-import 'package:tripper/atoms/trip_title.dart';
+import 'package:zipli/atoms/place_list_tile.dart';
+import 'package:zipli/atoms/trip_duration.dart';
+import 'package:zipli/atoms/trip_title.dart';
 
 import '../atoms/outlined_card.dart';
 import '../others/trip_details.dart';

@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
-import 'package:tripper/atoms/deletable_background.dart';
-import 'package:tripper/molecules/trip_overview.dart';
-import 'package:tripper/pages/edit_trip_page.dart';
+import 'package:zipli/atoms/deletable_background.dart';
+import 'package:zipli/molecules/trip_overview.dart';
+import 'package:zipli/pages/edit_trip_page.dart';
 
 import '../atoms/filled_button.dart';
 import '../others/trip_details.dart';

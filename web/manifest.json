@@ -1,6 +1,6 @@
 {
-    "name": "tripper",
-    "short_name": "tripper",
+    "name": "zipli",
+    "short_name": "zipli",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

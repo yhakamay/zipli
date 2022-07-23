@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:tripper/atoms/profile_navigation_destination.dart';
-import 'package:tripper/atoms/trips_navigation_destination.dart';
-import 'package:tripper/organisms/my_trips_list_view.dart';
-import 'package:tripper/pages/new_trip_page.dart';
+import 'package:zipli/atoms/profile_navigation_destination.dart';
+import 'package:zipli/atoms/trips_navigation_destination.dart';
+import 'package:zipli/organisms/my_trips_list_view.dart';
+import 'package:zipli/pages/new_trip_page.dart';
 
 class HomePage extends StatefulWidget {
   static const id = '/';
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tripper'),
+        title: const Text('Zipli'),
       ),
       bottomNavigationBar: _buildNavigationBar(),
       body: [
