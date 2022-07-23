@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:tripper/atoms/filled_button.dart';
 import 'package:uuid/uuid.dart';
 
+import '../atoms/deletable_background.dart';
+import '../atoms/filled_button.dart';
 import '../atoms/filled_tonal_button.dart';
+import '../atoms/no_locations.dart';
 import '../atoms/outlined_card.dart';
+import '../atoms/place_list_tile.dart';
+import '../atoms/trip_duration.dart';
+import '../atoms/trip_title.dart';
+import '../molecules/google_map_with_markers.dart';
 import '../others/place_api.dart';
 import '../others/place_details.dart';
 import '../others/place_search_delegate.dart';
@@ -27,8 +31,7 @@ class EditTripPage extends StatefulWidget {
 class _EditTripPageState extends State<EditTripPage> {
   @override
   Widget build(BuildContext context) {
-    final completer = Completer<GoogleMapController>();
-    final markers = _getMarkers(widget.tripDetails);
+    final tripDetails = widget.tripDetails;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -64,91 +67,36 @@ class _EditTripPageState extends State<EditTripPage> {
         ),
         body: ListView(
           children: [
+            Center(child: TripTitle(tripDetails.title)),
             Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  widget.tripDetails.title ?? 'No title',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
-            ),
-            Center(
-              child: Text(
-                '${DateFormat.yMMMd().format(widget.tripDetails.startDate)} - ${DateFormat.yMMMMd().format(widget.tripDetails.endDate)}',
+              child: TripDuration(
+                startDate: tripDetails.startDate,
+                endDate: tripDetails.endDate,
               ),
             ),
             const SizedBox(height: 12),
             Column(
               children: [
-                if (widget.tripDetails.places.isEmpty)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 80.0,
-                    child: Center(
-                      child: Text(
-                        'Add some!',
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ),
-                  )
+                if (tripDetails.places.isEmpty)
+                  const NoLocations()
                 else
-                  SizedBox(
-                    height: 180,
-                    child: ReorderableListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      onReorder: (int oldIndex, int newIndex) {
-                        if (oldIndex < newIndex) {
-                          newIndex -= 1;
+                  ReorderableListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onReorder: _updatePlacesOrder,
+                    itemCount: tripDetails.places.length,
+                    itemBuilder: (context, index) => Dismissible(
+                      key: ValueKey(tripDetails.places[index]),
+                      background: const DeletableBackground(),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) {
+                        if (direction == DismissDirection.endToStart) {
+                          setState(() {
+                            tripDetails.places.removeAt(index);
+                          });
                         }
-
-                        final place =
-                            widget.tripDetails.places.removeAt(oldIndex);
-
-                        setState(() {
-                          widget.tripDetails.places.insert(newIndex, place);
-                        });
                       },
-                      itemCount: widget.tripDetails.places.length,
-                      itemBuilder: (context, index) {
-                        return Dismissible(
-                          key: ValueKey(widget.tripDetails.places[index]),
-                          background: Container(
-                            color: Theme.of(context).colorScheme.error,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Icon(
-                                  Icons.delete,
-                                  color: Theme.of(context).colorScheme.onError,
-                                ),
-                                const SizedBox(width: 8.0),
-                              ],
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          onDismissed: (direction) {
-                            if (direction == DismissDirection.endToStart) {
-                              setState(() {
-                                widget.tripDetails.places.removeAt(index);
-                              });
-                            }
-                          },
-                          child: ListTile(
-                            title: Text(widget.tripDetails.places[index].name ??
-                                'Unknown'),
-                            subtitle: Text(
-                                widget.tripDetails.places[index].city ??
-                                    'Unknown'),
-                            trailing: const Icon(Icons.reorder),
-                            visualDensity: const VisualDensity(
-                              horizontal: 0,
-                              vertical: -4,
-                            ),
-                          ),
-                        );
-                      },
+                      child: PlaceListTile(place: tripDetails.places[index]),
                     ),
                   ),
                 FilledTonalButton(
@@ -157,36 +105,12 @@ class _EditTripPageState extends State<EditTripPage> {
                 ),
               ],
             ),
-            if (widget.tripDetails.places.isNotEmpty)
+            if (tripDetails.places.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: OutlinedCard(
-                  child: SizedBox(
-                    height: 240.0,
-                    child: GoogleMap(
-                      mapType: MapType.normal,
-                      myLocationButtonEnabled: false,
-                      scrollGesturesEnabled: false,
-                      onMapCreated: (GoogleMapController controller) {
-                        completer.complete(controller);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          return controller.animateCamera(
-                            CameraUpdate.newLatLngBounds(
-                              _getLatLngBounds(widget.tripDetails),
-                              60.0,
-                            ),
-                          );
-                        });
-                      },
-                      markers: markers,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          widget.tripDetails.places.first.location!.latitude,
-                          widget.tripDetails.places.first.location!.longitude,
-                        ),
-                        zoom: 15,
-                      ),
-                    ),
+                  child: GoogleMapWithMarkers(
+                    places: tripDetails.places,
                   ),
                 ),
               ),
@@ -195,7 +119,7 @@ class _EditTripPageState extends State<EditTripPage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            _saveTripDetails(widget.tripDetails);
+            _saveTripDetails(tripDetails);
             Navigator.pop(context);
           },
           icon: const Icon(Icons.done),
@@ -226,53 +150,6 @@ class _EditTripPageState extends State<EditTripPage> {
     return placeApiProvider.getPlaceDetails(placeId);
   }
 
-  Set<Marker> _getMarkers(TripDetails tripDetails) {
-    final markers = <Marker>{};
-
-    for (final place in tripDetails.places) {
-      markers.add(
-        Marker(
-          markerId: MarkerId(const Uuid().v4()),
-          position: LatLng(
-            place.location!.latitude,
-            place.location!.longitude,
-          ),
-        ),
-      );
-    }
-
-    return markers;
-  }
-
-  LatLngBounds _getLatLngBounds(TripDetails tripDetails) {
-    assert(tripDetails.places.isNotEmpty);
-
-    double? x0, x1, y0, y1;
-    final List<LatLng> latLngs = tripDetails.places.map((place) {
-      return LatLng(
-        place.location!.latitude,
-        place.location!.longitude,
-      );
-    }).toList();
-
-    for (LatLng latLng in latLngs) {
-      if (x0 == null) {
-        x0 = x1 = latLng.latitude;
-        y0 = y1 = latLng.longitude;
-      } else {
-        if (latLng.latitude > x1!) x1 = latLng.latitude;
-        if (latLng.latitude < x0) x0 = latLng.latitude;
-        if (latLng.longitude > y1!) y1 = latLng.longitude;
-        if (latLng.longitude < y0!) y0 = latLng.longitude;
-      }
-    }
-
-    return LatLngBounds(
-      northeast: LatLng(x1!, y1!),
-      southwest: LatLng(x0!, y0!),
-    );
-  }
-
   Future<void> _saveTripDetails(TripDetails tripDetails) async {
     final users = FirebaseFirestore.instance.collection('users');
     final me = users.doc(FirebaseAuth.instance.currentUser!.uid);
@@ -283,5 +160,17 @@ class _EditTripPageState extends State<EditTripPage> {
         .update(tripDetails.toFirestore())
         .then((value) => print('Trip saved!'))
         .catchError((error) => print(error));
+  }
+
+  void _updatePlacesOrder(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final place = widget.tripDetails.places.removeAt(oldIndex);
+
+    setState(() {
+      widget.tripDetails.places.insert(newIndex, place);
+    });
   }
 }
