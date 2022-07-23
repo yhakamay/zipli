@@ -19,26 +19,19 @@ class GoogleMapWithMarkers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 320.0,
-      child: IgnorePointer(
-        ignoring: true,
-        child: GoogleMap(
-          mapType: MapType.normal,
-          myLocationButtonEnabled: false,
-          scrollGesturesEnabled: false,
-          onMapCreated: _onMapCreated,
-          markers: markers,
-          polylines: polylines,
-          initialCameraPosition: CameraPosition(
-            target: LatLng(
-              places.first.location!.latitude,
-              places.first.location!.longitude,
-            ),
-            zoom: 15,
-          ),
+    return GoogleMap(
+      mapType: MapType.normal,
+      myLocationButtonEnabled: false,
+      scrollGesturesEnabled: false,
+      onMapCreated: _onMapCreated,
+      markers: markers,
+      polylines: polylines,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(
+          places.first.location!.latitude,
+          places.first.location!.longitude,
         ),
+        zoom: 15,
       ),
     );
   }

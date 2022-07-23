@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:uuid/uuid.dart';
 
 import '../atoms/deletable_background.dart';
 import '../atoms/filled_button.dart';
 import '../atoms/filled_tonal_button.dart';
 import '../atoms/no_locations.dart';
-import '../atoms/outlined_card.dart';
 import '../atoms/place_list_tile.dart';
 import '../atoms/trip_duration.dart';
 import '../atoms/trip_title.dart';
@@ -70,69 +70,92 @@ class _EditTripPageState extends State<EditTripPage> {
             },
             icon: const Icon(Icons.close),
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _saveTripDetails(tripDetails);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.done),
+            )
+          ],
           title: const Text('Edit Trip'),
         ),
-        body: ListView(
-          children: [
-            Center(child: TripTitle(tripDetails.title)),
-            Center(
-              child: TripDuration(
-                startDate: tripDetails.startDate,
-                endDate: tripDetails.endDate,
+        body: SlidingUpPanel(
+          maxHeight: 1000,
+          minHeight: 100,
+          snapPoint: 0.4,
+          panelSnapping: true,
+          defaultPanelState: PanelState.CLOSED,
+          backdropEnabled: true,
+          body: tripDetails.places.isNotEmpty
+              ? GoogleMapWithMarkers(
+                  places: tripDetails.places,
+                  markers: _getMarkers(tripDetails.places),
+                  polylines: _getPolylines(tripDetails.places),
+                )
+              : const NoLocations(),
+          panelBuilder: (sc) => ListView(
+            controller: sc,
+            children: [
+              const SizedBox(
+                height: 12.0,
               ),
-            ),
-            const SizedBox(height: 12),
-            Column(
-              children: [
-                if (tripDetails.places.isEmpty)
-                  const NoLocations()
-                else
-                  ReorderableListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onReorder: _updatePlacesOrder,
-                    itemCount: tripDetails.places.length,
-                    itemBuilder: (context, index) => Dismissible(
-                      key: ValueKey(tripDetails.places[index]),
-                      background: const DeletableBackground(),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (direction) {
-                        if (direction == DismissDirection.endToStart) {
-                          setState(() {
-                            tripDetails.places.removeAt(index);
-                          });
-                        }
-                      },
-                      child: PlaceListTile(place: tripDetails.places[index]),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 30,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(12.0),
+                      ),
                     ),
                   ),
-                FilledTonalButton(
-                  onPressed: _showPlaceSearch,
-                  child: const Icon(Icons.add),
-                ),
-              ],
-            ),
-            if (tripDetails.places.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: OutlinedCard(
-                  child: GoogleMapWithMarkers(
-                    places: tripDetails.places,
-                    markers: _getMarkers(tripDetails.places),
-                    polylines: _getPolylines(tripDetails.places),
-                  ),
+                ],
+              ),
+              Center(child: TripTitle(tripDetails.title)),
+              Center(
+                child: TripDuration(
+                  startDate: tripDetails.startDate,
+                  endDate: tripDetails.endDate,
                 ),
               ),
-          ],
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            _saveTripDetails(tripDetails);
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.done),
-          label: const Text('Save'),
+              const SizedBox(height: 24),
+              Column(
+                children: [
+                  if (tripDetails.places.isEmpty)
+                    const NoLocations()
+                  else
+                    ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onReorder: _updatePlacesOrder,
+                      itemCount: tripDetails.places.length,
+                      itemBuilder: (context, index) => Dismissible(
+                        key: ValueKey(tripDetails.places[index]),
+                        background: const DeletableBackground(),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) {
+                          if (direction == DismissDirection.endToStart) {
+                            setState(() {
+                              tripDetails.places.removeAt(index);
+                            });
+                          }
+                        },
+                        child: PlaceListTile(place: tripDetails.places[index]),
+                      ),
+                    ),
+                  FilledTonalButton(
+                    onPressed: _showPlaceSearch,
+                    child: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
