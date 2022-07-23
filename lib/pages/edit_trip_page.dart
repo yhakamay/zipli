@@ -62,124 +62,135 @@ class _EditTripPageState extends State<EditTripPage> {
           ),
           title: const Text('Edit Trip'),
         ),
-        body: OutlinedCard(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
+        body: ListView(
+          children: [
+            Center(
+              child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   widget.tripDetails.title ?? 'No title',
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
-              Text(
+            ),
+            Center(
+              child: Text(
                 '${DateFormat.yMMMd().format(widget.tripDetails.startDate)} - ${DateFormat.yMMMMd().format(widget.tripDetails.endDate)}',
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0),
-                child: Column(
-                  children: [
-                    if (widget.tripDetails.places.isEmpty)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 80.0,
-                        child: Center(
-                          child: Text(
-                            'Add some!',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                        ),
-                      )
-                    else
-                      SizedBox(
-                        height: 180,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: widget.tripDetails.places.length,
-                          itemBuilder: (context, index) {
-                            return Dismissible(
-                              key: ValueKey(widget.tripDetails.places[index]),
-                              background: Container(
-                                color: Theme.of(context).colorScheme.error,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      color:
-                                          Theme.of(context).colorScheme.onError,
-                                    ),
-                                    const SizedBox(width: 8.0),
-                                  ],
-                                ),
-                              ),
-                              direction: DismissDirection.endToStart,
-                              onDismissed: (direction) {
-                                if (direction == DismissDirection.endToStart) {
-                                  setState(() {
-                                    widget.tripDetails.places.removeAt(index);
-                                  });
-                                }
-                              },
-                              child: ListTile(
-                                title: Text(
-                                    widget.tripDetails.places[index].name ??
-                                        'Unknown'),
-                                subtitle: Text(
-                                    widget.tripDetails.places[index].city ??
-                                        'Unknown'),
-                                visualDensity: const VisualDensity(
-                                  horizontal: 0,
-                                  vertical: -4,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+            ),
+            const SizedBox(height: 12),
+            Column(
+              children: [
+                if (widget.tripDetails.places.isEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 80.0,
+                    child: Center(
+                      child: Text(
+                        'Add some!',
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                    FilledTonalButton(
-                      onPressed: _showPlaceSearch,
-                      child: const Icon(Icons.add),
                     ),
-                  ],
-                ),
-              ),
-              if (widget.tripDetails.places.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: OutlinedCard(
-                    child: SizedBox(
-                      height: 240.0,
-                      child: GoogleMap(
-                        mapType: MapType.normal,
-                        myLocationButtonEnabled: false,
-                        scrollGesturesEnabled: false,
-                        onMapCreated: (GoogleMapController controller) {
-                          completer.complete(controller);
-                          Future.delayed(const Duration(milliseconds: 200), () {
-                            return controller.animateCamera(
-                              CameraUpdate.newLatLngBounds(
-                                _getLatLngBounds(widget.tripDetails),
-                                60.0,
-                              ),
-                            );
-                          });
-                        },
-                        markers: markers,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                            widget.tripDetails.places.first.location!.latitude,
-                            widget.tripDetails.places.first.location!.longitude,
+                  )
+                else
+                  SizedBox(
+                    height: 180,
+                    child: ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onReorder: (int oldIndex, int newIndex) {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+
+                        final place =
+                            widget.tripDetails.places.removeAt(oldIndex);
+
+                        setState(() {
+                          widget.tripDetails.places.insert(newIndex, place);
+                        });
+                      },
+                      itemCount: widget.tripDetails.places.length,
+                      itemBuilder: (context, index) {
+                        return Dismissible(
+                          key: ValueKey(widget.tripDetails.places[index]),
+                          background: Container(
+                            color: Theme.of(context).colorScheme.error,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  color: Theme.of(context).colorScheme.onError,
+                                ),
+                                const SizedBox(width: 8.0),
+                              ],
+                            ),
                           ),
-                          zoom: 15,
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              setState(() {
+                                widget.tripDetails.places.removeAt(index);
+                              });
+                            }
+                          },
+                          child: ListTile(
+                            title: Text(widget.tripDetails.places[index].name ??
+                                'Unknown'),
+                            subtitle: Text(
+                                widget.tripDetails.places[index].city ??
+                                    'Unknown'),
+                            trailing: const Icon(Icons.reorder),
+                            visualDensity: const VisualDensity(
+                              horizontal: 0,
+                              vertical: -4,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                FilledTonalButton(
+                  onPressed: _showPlaceSearch,
+                  child: const Icon(Icons.add),
+                ),
+              ],
+            ),
+            if (widget.tripDetails.places.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: OutlinedCard(
+                  child: SizedBox(
+                    height: 240.0,
+                    child: GoogleMap(
+                      mapType: MapType.normal,
+                      myLocationButtonEnabled: false,
+                      scrollGesturesEnabled: false,
+                      onMapCreated: (GoogleMapController controller) {
+                        completer.complete(controller);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          return controller.animateCamera(
+                            CameraUpdate.newLatLngBounds(
+                              _getLatLngBounds(widget.tripDetails),
+                              60.0,
+                            ),
+                          );
+                        });
+                      },
+                      markers: markers,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          widget.tripDetails.places.first.location!.latitude,
+                          widget.tripDetails.places.first.location!.longitude,
                         ),
+                        zoom: 15,
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
