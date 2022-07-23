@@ -1,13 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'pages/home_page.dart';
+import 'firebase_options.dart';
+import 'others/auth_gate.dart';
 
-void main() {
-  runApp(const Tripper());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const Zipli());
 }
 
-class Tripper extends StatelessWidget {
-  const Tripper({Key? key}) : super(key: key);
+class Zipli extends StatelessWidget {
+  const Zipli({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +21,11 @@ class Tripper extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.blue,
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+        ),
       ),
-      home: const HomePage(title: 'Tripper'),
+      home: const AuthGate(),
     );
   }
 }

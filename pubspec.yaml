@@ -1,6 +1,6 @@
-name: tripper
+name: zipli
 
-description: Tripper helps users to plan a new trip.
+description: Zipli helps users to plan a new trip.
 
 publish_to: 'none'
 
@@ -13,6 +13,15 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  intl: ^0.17.0
+  http: ^0.13.4
+  uuid: ^3.0.6
+  localstore: ^1.2.3
+  flutterfire_ui: ^0.4.2+3
+  firebase_core: ^1.19.2
+  cloud_firestore: ^3.3.0
+  firebase_auth: ^3.4.2
+  google_maps_flutter: ^2.1.8
 
 dev_dependencies:
   flutter_test:
