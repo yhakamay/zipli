@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:tripper/atoms/place_list_tile.dart';
+import 'package:tripper/atoms/trip_duration.dart';
+import 'package:tripper/atoms/trip_title.dart';
 
 import '../atoms/outlined_card.dart';
 import '../others/trip_details.dart';
@@ -37,13 +39,16 @@ class TripOverview extends StatefulWidget {
 class _TripOverviewState extends State<TripOverview> {
   @override
   Widget build(BuildContext context) {
+    final tripDetails = widget.tripDetails;
+
     switch (widget.size) {
       case TripOverviewSize.small:
         return OutlinedCard(
           child: ListTile(
-            title: Text(widget.tripDetails.title ?? 'Unknown'),
-            subtitle: Text(
-              '${DateFormat.yMMMMd().format(widget.tripDetails.startDate)} - ${DateFormat.yMMMMd().format(widget.tripDetails.endDate)}',
+            title: TripTitle(tripDetails.title),
+            subtitle: TripDuration(
+              startDate: tripDetails.startDate,
+              endDate: tripDetails.endDate,
             ),
           ),
         );
@@ -52,31 +57,22 @@ class _TripOverviewState extends State<TripOverview> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  widget.tripDetails.title ?? 'No title',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-              ),
-              Text(
-                '${DateFormat.yMMMd().format(widget.tripDetails.startDate)} - ${DateFormat.yMMMMd().format(widget.tripDetails.endDate)}',
+              TripTitle(tripDetails.title),
+              TripDuration(
+                startDate: tripDetails.startDate,
+                endDate: tripDetails.endDate,
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 24.0),
+                padding: const EdgeInsets.only(top: 12.0),
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: widget.tripDetails.places.length,
                   itemBuilder: (context, index) {
                     final place = widget.tripDetails.places[index];
 
-                    return ListTile(
-                      title: Text(place.name ?? 'Unknown'),
-                      subtitle: Text(place.city ?? 'Unknown'),
-                      visualDensity: const VisualDensity(
-                        horizontal: 0,
-                        vertical: -4,
-                      ),
+                    return PlaceListTile(
+                      place: place,
+                      reorderable: false,
                     );
                   },
                 ),

@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tripper/atoms/filled_button.dart';
 import 'package:tripper/atoms/filled_tonal_button.dart';
+import 'package:tripper/atoms/no_locations.dart';
 import 'package:tripper/others/place_api.dart';
 import 'package:tripper/others/trip_details.dart';
 import 'package:uuid/uuid.dart';
 
+import '../atoms/deletable_background.dart';
+import '../atoms/place_list_tile.dart';
 import '../molecules/trip_overview.dart';
 import '../others/place_details.dart';
 import '../others/place_search_delegate.dart';
@@ -44,7 +47,29 @@ class _NewTripPageState extends State<NewTripPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => AlertDialog(
+                  title: const Text('Discard changes?'),
+                  content: const Text('Changes you made will not be saved.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    FilledButton(
+                      child: const Text('OK'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
             icon: const Icon(Icons.close),
           ),
           title: const Text('New Trip'),
@@ -149,36 +174,30 @@ class _NewTripPageState extends State<NewTripPage> {
       isActive: _currentIndex == 1,
       content: Column(
         children: [
-          _tripDetails.places.isEmpty
-              ? SizedBox(
-                  width: double.infinity,
-                  height: 80.0,
-                  child: Center(
-                    child: Text(
-                      'Add some!',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                  ),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _tripDetails.places.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_tripDetails.places[index].name ?? 'Unknown'),
-                      subtitle:
-                          Text(_tripDetails.places[index].city ?? 'Unknown'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            _tripDetails.places.removeAt(index);
-                          });
-                        },
-                      ),
-                    );
-                  },
+          if (_tripDetails.places.isEmpty)
+            const NoLocations()
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _tripDetails.places.length,
+              itemBuilder: (context, index) => Dismissible(
+                key: ValueKey(_tripDetails.places[index]),
+                background: const DeletableBackground(),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  if (direction == DismissDirection.endToStart) {
+                    setState(() {
+                      _tripDetails.places.removeAt(index);
+                    });
+                  }
+                },
+                child: PlaceListTile(
+                  place: _tripDetails.places[index],
+                  reorderable: false,
                 ),
+              ),
+            ),
           FilledTonalButton(
             onPressed: _showPlaceSearch,
             child: const Icon(Icons.add),
