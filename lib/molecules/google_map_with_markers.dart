@@ -22,19 +22,22 @@ class GoogleMapWithMarkers extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 320.0,
-      child: GoogleMap(
-        mapType: MapType.normal,
-        myLocationButtonEnabled: false,
-        scrollGesturesEnabled: false,
-        onMapCreated: _onMapCreated,
-        markers: markers,
-        polylines: polylines,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(
-            places.first.location!.latitude,
-            places.first.location!.longitude,
+      child: IgnorePointer(
+        ignoring: true,
+        child: GoogleMap(
+          mapType: MapType.normal,
+          myLocationButtonEnabled: false,
+          scrollGesturesEnabled: false,
+          onMapCreated: _onMapCreated,
+          markers: markers,
+          polylines: polylines,
+          initialCameraPosition: CameraPosition(
+            target: LatLng(
+              places.first.location!.latitude,
+              places.first.location!.longitude,
+            ),
+            zoom: 15,
           ),
-          zoom: 15,
         ),
       ),
     );
