@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/firestore.dart';
+import 'package:tripper/atoms/deletable_background.dart';
 import 'package:tripper/molecules/trip_overview.dart';
 import 'package:tripper/pages/edit_trip_page.dart';
 
@@ -27,19 +28,7 @@ class MyTripsListView extends StatelessWidget {
 
         return Dismissible(
           key: ValueKey(tripDetails.id),
-          background: Container(
-            color: Theme.of(context).colorScheme.error,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(
-                  Icons.delete,
-                  color: Theme.of(context).colorScheme.onError,
-                ),
-                const SizedBox(width: 8.0),
-              ],
-            ),
-          ),
+          background: const DeletableBackground(),
           direction: DismissDirection.endToStart,
           onDismissed: (direction) {
             FirebaseFirestore.instance
