@@ -2,30 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 import '../others/place_details.dart';
 
-class GoogleMapWithMarkers extends StatefulWidget {
+class GoogleMapWithMarkers extends StatelessWidget {
   const GoogleMapWithMarkers({
     Key? key,
     required this.places,
+    required this.markers,
+    required this.polylines,
   }) : super(key: key);
 
   final List<PlaceDetails> places;
-
-  @override
-  State<GoogleMapWithMarkers> createState() => _GoogleMapWithMarkersState();
-}
-
-class _GoogleMapWithMarkersState extends State<GoogleMapWithMarkers> {
-  final completer = Completer<GoogleMapController>();
+  final Set<Marker> markers;
+  final Set<Polyline> polylines;
 
   @override
   Widget build(BuildContext context) {
-    final places = widget.places;
-    final markers = _getMarkers(places);
-
     return SizedBox(
       width: double.infinity,
       height: 320.0,
@@ -33,18 +26,9 @@ class _GoogleMapWithMarkersState extends State<GoogleMapWithMarkers> {
         mapType: MapType.normal,
         myLocationButtonEnabled: false,
         scrollGesturesEnabled: false,
-        onMapCreated: (GoogleMapController controller) {
-          completer.complete(controller);
-          Future.delayed(const Duration(milliseconds: 200), () {
-            return controller.animateCamera(
-              CameraUpdate.newLatLngBounds(
-                _getLatLngBounds(places),
-                60.0,
-              ),
-            );
-          });
-        },
+        onMapCreated: _onMapCreated,
         markers: markers,
+        polylines: polylines,
         initialCameraPosition: CameraPosition(
           target: LatLng(
             places.first.location!.latitude,
@@ -54,24 +38,6 @@ class _GoogleMapWithMarkersState extends State<GoogleMapWithMarkers> {
         ),
       ),
     );
-  }
-
-  Set<Marker> _getMarkers(List<PlaceDetails> places) {
-    final markers = <Marker>{};
-
-    for (final place in places) {
-      markers.add(
-        Marker(
-          markerId: MarkerId(const Uuid().v4()),
-          position: LatLng(
-            place.location!.latitude,
-            place.location!.longitude,
-          ),
-        ),
-      );
-    }
-
-    return markers;
   }
 
   LatLngBounds _getLatLngBounds(List<PlaceDetails> places) {
@@ -101,5 +67,16 @@ class _GoogleMapWithMarkersState extends State<GoogleMapWithMarkers> {
       northeast: LatLng(x1!, y1!),
       southwest: LatLng(x0!, y0!),
     );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      return controller.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          _getLatLngBounds(places),
+          60.0,
+        ),
+      );
+    });
   }
 }

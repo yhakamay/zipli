@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../atoms/deletable_background.dart';
@@ -29,10 +30,16 @@ class EditTripPage extends StatefulWidget {
 }
 
 class _EditTripPageState extends State<EditTripPage> {
+  late TripDetails tripDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    tripDetails = widget.tripDetails;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final tripDetails = widget.tripDetails;
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -111,6 +118,8 @@ class _EditTripPageState extends State<EditTripPage> {
                 child: OutlinedCard(
                   child: GoogleMapWithMarkers(
                     places: tripDetails.places,
+                    markers: _getMarkers(tripDetails.places),
+                    polylines: _getPolylines(tripDetails.places),
                   ),
                 ),
               ),
@@ -139,7 +148,7 @@ class _EditTripPageState extends State<EditTripPage> {
     final placeDetails = await _getPlaceDetails(result!.placeId);
 
     setState(() {
-      widget.tripDetails.places.add(placeDetails);
+      tripDetails.places.add(placeDetails);
     });
   }
 
@@ -167,10 +176,56 @@ class _EditTripPageState extends State<EditTripPage> {
       newIndex -= 1;
     }
 
-    final place = widget.tripDetails.places.removeAt(oldIndex);
+    final place = tripDetails.places.removeAt(oldIndex);
 
     setState(() {
-      widget.tripDetails.places.insert(newIndex, place);
+      tripDetails.places.insert(newIndex, place);
+      tripDetails = tripDetails;
     });
+  }
+
+  Set<Marker> _getMarkers(List<PlaceDetails> places) {
+    final markers = <Marker>{};
+
+    for (final place in places) {
+      markers.add(
+        Marker(
+          markerId: MarkerId(const Uuid().v4()),
+          position: LatLng(
+            place.location!.latitude,
+            place.location!.longitude,
+          ),
+        ),
+      );
+    }
+
+    return markers;
+  }
+
+  Set<Polyline> _getPolylines(List<PlaceDetails> places) {
+    final polylines = <Polyline>{};
+    final polylineId = PolylineId(const Uuid().v4());
+    final points = <LatLng>[];
+
+    for (final place in places) {
+      points.add(
+        LatLng(
+          place.location!.latitude,
+          place.location!.longitude,
+        ),
+      );
+    }
+
+    polylines.add(
+      Polyline(
+        polylineId: polylineId,
+        visible: true,
+        points: points,
+        color: Colors.orange,
+        width: 4,
+      ),
+    );
+
+    return polylines;
   }
 }
